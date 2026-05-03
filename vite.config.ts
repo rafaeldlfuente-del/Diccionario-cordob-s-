@@ -15,7 +15,7 @@ export default defineConfig(({mode}) => {
       VitePWA({
         injectRegister: 'script',
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+        includeAssets: ['icon.svg'],
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
           runtimeCaching: [
@@ -38,30 +38,31 @@ export default defineConfig(({mode}) => {
         manifest: {
           name: 'Diccionario Cordobés',
           short_name: 'Cordobés',
-          description: 'Diccionario de habla coloquial, idiosincrasia y orgullo de pertenencia de Córdoba.',
+          description: 'El diccionario definitivo del habla cordobesa, PWA instalable con palabra del día y notificaciones.',
           theme_color: '#1a5276',
           background_color: '#fdf6e3',
           display: 'standalone',
           orientation: 'portrait',
-          start_url: './index.html',
+          start_url: './',
           scope: './',
-          id: '/diccionario-cordobes/',
+          id: 'diccionario-cordobes-pwa',
           icons: [
             {
-              src: 'favicon.ico',
-              sizes: '64x64 32x32 24x24 16x16',
-              type: 'image/x-icon'
-            },
-            {
-              src: 'favicon.ico',
+              src: 'icon.svg',
               sizes: '192x192',
-              type: 'image/png',
+              type: 'image/svg+xml',
               purpose: 'any'
             },
             {
-              src: 'favicon.ico',
+              src: 'icon.svg',
               sizes: '512x512',
-              type: 'image/png',
+              type: 'image/svg+xml',
+              purpose: 'any'
+            },
+            {
+              src: 'icon.svg',
+              sizes: '512x512',
+              type: 'image/svg+xml',
               purpose: 'maskable'
             }
           ]
