@@ -14,16 +14,31 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
         manifest: {
           name: 'Diccionario Cordobés',
           short_name: 'Cordobés',
           description: 'Diccionario de habla coloquial, idiosincrasia y orgullo de pertenencia de Córdoba.',
           theme_color: '#1a5276',
+          background_color: '#fdf6e3',
+          display: 'standalone',
           icons: [
             {
               src: 'favicon.ico',
               sizes: '64x64 32x32 24x24 16x16',
               type: 'image/x-icon'
+            },
+            {
+              src: 'favicon.ico',
+              sizes: '192x192',
+              type: 'image/x-icon',
+              purpose: 'any'
+            },
+            {
+              src: 'favicon.ico',
+              sizes: '512x512',
+              type: 'image/x-icon',
+              purpose: 'maskable'
             }
           ]
         }

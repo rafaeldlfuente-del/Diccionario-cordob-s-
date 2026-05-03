@@ -12,9 +12,61 @@ export default function App() {
   const [search, setSearch] = useState('');
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
 
-  const letraDeEntrada = (e: Entrada) => {
-    return e.v.normalize('NFD').replace(/[\u0300-\u036f]/g, '')[0].toUpperCase();
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallBtn, setShowInstallBtn] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallBtn(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+    setDeferredPrompt(null);
+    setShowInstallBtn(false);
   };
+
+  const letraDeEntrada = (e: Entrada) => {
+    const firstChar = e.v.trim().toUpperCase()[0];
+    if (firstChar === 'Ñ') return 'Ñ';
+    return firstChar.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  };
+
+  const getWordOfTheDay = () => {
+    const today = new Date();
+    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    const index = seed % ENTRADAS.length;
+    return ENTRADAS[index];
+  };
+
+  const wordOfTheDay = useMemo(() => getWordOfTheDay(), []);
+
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          const lastShown = localStorage.getItem('lastNotificationDate');
+          const todayStr = new Date().toDateString();
+          
+          if (lastShown !== todayStr) {
+            new Notification('Palabra del Día Cordobesa', {
+              body: `¿Sabes qué significa "${wordOfTheDay.v}"? ${wordOfTheDay.def}`,
+              icon: '/favicon.ico'
+            });
+            localStorage.setItem('lastNotificationDate', todayStr);
+          }
+        }
+      });
+    }
+  }, [wordOfTheDay]);
 
   const filteredEntries = useMemo(() => {
     let result = ENTRADAS;
@@ -26,7 +78,7 @@ export default function App() {
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(e =>
-        e.v.toLowerCase().includes(q) ||
+        e.v.toLowerCase().startsWith(q) ||
         e.def.toLowerCase().includes(q) ||
         (e.ej && e.ej.toLowerCase().includes(q))
       );
@@ -132,8 +184,16 @@ export default function App() {
             />
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none">🔍</span>
           </div>
-          <div className="contador font-libre text-sm text-oro-claro whitespace-nowrap">
-            {filteredEntries.length} entradas
+          <div className="contador font-libre text-sm text-oro-claro whitespace-nowrap flex items-center gap-4">
+            {showInstallBtn && (
+              <button 
+                onClick={handleInstallClick}
+                className="bg-oro text-tinta px-3 py-1 rounded text-xs font-bold uppercase tracking-tighter hover:bg-oro-claro transition-colors cursor-pointer"
+              >
+                Instalar App
+              </button>
+            )}
+            <span>{filteredEntries.length} entradas</span>
           </div>
         </div>
       </header>
@@ -158,6 +218,31 @@ export default function App() {
       </nav>
 
       <main className="contenido max-w-[1100px] mx-auto p-6 pb-16">
+        {!search && !activeLetter && (
+          <section className="word-of-the-day mb-12 bg-white border-2 border-oro p-8 rounded-lg shadow-lg relative overflow-hidden group">
+            <div className="absolute top-0 right-0 bg-oro text-tinta px-4 py-1 font-bold text-xs uppercase tracking-widest">
+              Palabra del Día
+            </div>
+            <h2 className="font-playfair text-4xl font-black text-azul mb-4">
+              {wordOfTheDay.v}
+            </h2>
+            <p className="text-lg text-tinta-suave mb-4 italic leading-relaxed">
+              {wordOfTheDay.def}
+            </p>
+            {wordOfTheDay.ej && (
+              <div className="text-sm text-tinta-suave opacity-70 border-t border-dashed border-crema-oscura pt-4">
+                <span className="text-oro font-bold mr-2">✦</span>
+                "{wordOfTheDay.ej}"
+              </div>
+            )}
+            <div className="mt-6 flex justify-end">
+              <span className="text-[0.7rem] uppercase tracking-widest text-oro-claro font-bold">
+                Una joya de la identidad cordobesa
+              </span>
+            </div>
+          </section>
+        )}
+
         {filteredEntries.length === 0 ? (
           <div className="sin-resultados text-center py-16 px-8 text-tinta-suave opacity-50">
             <p className="font-playfair text-5xl mb-4">¡Cipote!</p>
@@ -206,7 +291,7 @@ export default function App() {
         <span className="opacity-60 text-[0.75rem]">
           Elaborado a partir de las palabras propuestas por internautas en redes sociales · Córdoba 2016
           <br />
-          Sincronizado: v1.3 - Mayo 2026
+          Sincronizado: v1.4 - Mayo 2026
         </span>
       </footer>
     </div>
