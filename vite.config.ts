@@ -13,6 +13,7 @@ export default defineConfig(({mode}) => {
       react(),
       tailwindcss(),
       VitePWA({
+        injectRegister: 'script',
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
         manifest: {
@@ -22,6 +23,8 @@ export default defineConfig(({mode}) => {
           theme_color: '#1a5276',
           background_color: '#fdf6e3',
           display: 'standalone',
+          start_url: './',
+          scope: './',
           icons: [
             {
               src: 'favicon.ico',
