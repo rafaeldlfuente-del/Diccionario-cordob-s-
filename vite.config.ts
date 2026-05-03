@@ -43,8 +43,9 @@ export default defineConfig(({mode}) => {
           background_color: '#fdf6e3',
           display: 'standalone',
           orientation: 'portrait',
-          start_url: '.',
-          scope: '/',
+          start_url: './index.html',
+          scope: './',
+          id: '/diccionario-cordobes/',
           icons: [
             {
               src: 'favicon.ico',
@@ -54,13 +55,13 @@ export default defineConfig(({mode}) => {
             {
               src: 'favicon.ico',
               sizes: '192x192',
-              type: 'image/x-icon',
+              type: 'image/png',
               purpose: 'any'
             },
             {
               src: 'favicon.ico',
               sizes: '512x512',
-              type: 'image/x-icon',
+              type: 'image/png',
               purpose: 'maskable'
             }
           ]

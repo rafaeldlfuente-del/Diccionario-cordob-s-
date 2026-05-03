@@ -19,7 +19,10 @@ export default function App() {
     const handler = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setShowInstallBtn(true);
+      // Solo mostrar si no está ya instalada (standalone)
+      if (!window.matchMedia('(display-mode: standalone)').matches) {
+        setShowInstallBtn(true);
+      }
     };
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
@@ -165,7 +168,7 @@ export default function App() {
             onClick={() => setShowApp(false)}
           >
             <small className="block font-libre text-[0.65rem] tracking-[0.2em] uppercase text-oro-claro font-normal italic">
-              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v1.8</span>
+              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v1.9</span>
             </small>
             Cordobés
           </div>
@@ -291,7 +294,7 @@ export default function App() {
         <span className="opacity-60 text-[0.75rem]">
           Elaborado a partir de las palabras propuestas por internautas en redes sociales · Córdoba 2016
           <br />
-          Sincronizado: v1.8 - Mayo 2026
+          Sincronizado: v1.9 - Mayo 2026
         </span>
       </footer>
     </div>
