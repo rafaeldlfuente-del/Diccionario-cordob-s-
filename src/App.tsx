@@ -101,9 +101,7 @@ export default function App() {
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(e =>
-        e.v.toLowerCase().startsWith(q) ||
-        e.def.toLowerCase().includes(q) ||
-        (e.ej && e.ej.toLowerCase().includes(q))
+        e.v.toLowerCase().startsWith(q)
       );
     }
 
@@ -188,7 +186,7 @@ export default function App() {
             onClick={() => setShowApp(false)}
           >
             <small className="block font-libre text-[0.65rem] tracking-[0.2em] uppercase text-oro-claro font-normal italic">
-              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v2.1</span>
+              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v2.2</span>
             </small>
             Cordobés
           </div>
@@ -330,11 +328,11 @@ export default function App() {
         <span className="opacity-60 text-[0.75rem]">
           Elaborado a partir de las palabras propuestas por internautas en redes sociales · Córdoba 2016
           <br />
-          Sincronizado: v2.1 - Mayo 2026
+          Sincronizado: v2.2 - Mayo 2026
         </span>
       </footer>
       <div className="fixed bottom-2 right-2 text-[10px] text-tinta opacity-20 pointer-events-none select-none z-[200]">
-        v2.1
+        v2.2
       </div>
     </div>
   );
