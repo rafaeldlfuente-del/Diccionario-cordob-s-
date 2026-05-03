@@ -16,6 +16,25 @@ export default defineConfig(({mode}) => {
         injectRegister: 'script',
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'google-fonts-cache',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
+              }
+            }
+          ]
+        },
         manifest: {
           name: 'Diccionario Cordobés',
           short_name: 'Cordobés',
@@ -23,8 +42,9 @@ export default defineConfig(({mode}) => {
           theme_color: '#1a5276',
           background_color: '#fdf6e3',
           display: 'standalone',
-          start_url: './',
-          scope: './',
+          orientation: 'portrait',
+          start_url: '.',
+          scope: '/',
           icons: [
             {
               src: 'favicon.ico',
