@@ -3,7 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # O 'master' si es el nombre de tu rama principal
+      - main
+      - master
+      - gh-pages # Por si el usuario usa esta rama como fuente
 
 permissions:
   contents: write
