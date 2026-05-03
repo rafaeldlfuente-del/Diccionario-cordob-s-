@@ -10,11 +10,18 @@ interface Entrada {
 
 export default function App() {
   const [showApp, setShowApp] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [search, setSearch] = useState('');
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallBtn, setShowInstallBtn] = useState(false);
+
+  const aboutText = `La Fundación Córdoba Ciudad Cultural ha elaborado este modesto diccionario a partir de las palabras y sus definiciones propuestas por los internautas en las redes sociales de Córdoba 2016 a lo largo del año 2010, tanto en Facebook como en Twitter y Tuenti.
+Este documento no tiene ninguna intención académica, ni sigue ningún criterio lingüístico. Por el contrario, trata de reflejar y dejar constancia de la idiosincrasia de los cordobeses a través de su habla coloquial, con el simple objetivo del entretenimiento y el reforzamiento del orgullo de pertenencia, algo que la candidatura de Córdoba a Capital Europea de la Cultura ha conseguido con creces. 
+No obstante, el lector observará que muchos de los vocablos incluidos son comunes a otras zonas de Andalucía, lo que no les quita valor como términos propios del habla cordobesa. Igualmente, se han incluido palabras que, a pesar de aparecer en el diccionario de la Real Academia de la Lengua, tienen en Córdoba un uso más extendido que en otros lugares de la geografía española o tienen acepciones diferentes a las comúnmente empleadas.
+Es importante remarcar, así mismo, que se ha tenido en cuenta la fonética y pronunciación de las palabras a la hora de representarlas gráficamente. 
+Nuestro agradecimiento a todas las personas que han participado en la elaboración de este diccionario, a través de miles de palabras y ejemplos de uso.`;
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -183,10 +190,13 @@ export default function App() {
         <div className="max-w-[1100px] mx-auto flex items-center gap-8 flex-wrap">
           <div
             className="header-titulo font-playfair text-2xl font-bold tracking-wider cursor-pointer"
-            onClick={() => setShowApp(false)}
+            onClick={() => {
+              setShowApp(false);
+              setShowAbout(false);
+            }}
           >
             <small className="block font-libre text-[0.65rem] tracking-[0.2em] uppercase text-oro-claro font-normal italic">
-              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v2.2</span>
+              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v2.3</span>
             </small>
             Cordobés
           </div>
@@ -200,6 +210,7 @@ export default function App() {
               onChange={(e) => {
                 setSearch(e.target.value);
                 setActiveLetter(null);
+                setShowAbout(false);
               }}
               autoComplete="off"
             />
@@ -214,111 +225,142 @@ export default function App() {
               </button>
             )}
           </div>
-          <div className="contador font-libre text-sm text-oro-claro whitespace-nowrap flex items-center gap-4">
-            {showInstallBtn && (
-              <button 
-                onClick={handleInstallClick}
-                className="bg-oro text-tinta px-3 py-1 rounded text-xs font-bold uppercase tracking-tighter hover:bg-oro-claro transition-colors cursor-pointer"
-              >
-                Instalar App
-              </button>
-            )}
+          <div className="contador font-libre text-sm text-oro-claro whitespace-nowrap flex items-center gap-6">
             <button
-              onClick={handleShare}
-              className="text-crema/80 hover:text-oro-claro transition-colors cursor-pointer"
-              title="Compartir Diccionario"
+              onClick={() => setShowAbout(!showAbout)}
+              className={`text-crema/80 hover:text-oro-claro transition-colors cursor-pointer decoration-oro/30 underline-offset-4 mt-0.5 ${showAbout ? 'underline text-oro-claro' : ''}`}
             >
-              <Share2 size={20} />
+              Sobre el diccionario
             </button>
-            <span>{filteredEntries.length} entradas</span>
+            <div className="flex items-center gap-4">
+              {showInstallBtn && (
+                <button 
+                  onClick={handleInstallClick}
+                  className="bg-oro text-tinta px-3 py-1 rounded text-xs font-bold uppercase tracking-tighter hover:bg-oro-claro transition-colors cursor-pointer"
+                >
+                  Instalar App
+                </button>
+              )}
+              <button
+                onClick={handleShare}
+                className="text-crema/80 hover:text-oro-claro transition-colors cursor-pointer"
+                title="Compartir Diccionario"
+              >
+                <Share2 size={20} />
+              </button>
+              <span>{filteredEntries.length} entradas</span>
+            </div>
           </div>
         </div>
       </header>
 
-      <nav className="abecedario bg-crema-oscura border-b-2 border-azul p-2.5 flex flex-wrap gap-0.5 justify-center sticky top-[88px] z-90 md:top-[80px]">
-        {abecedario.map((l) => {
-          const tiene = letrasConEntradas.has(l);
-          return (
-            <button
-              key={l}
-              className={`letra-btn font-playfair text-base font-bold w-8 h-8 flex items-center justify-center cursor-pointer border-none bg-transparent text-tinta-suave transition-all rounded-[2px] ${
-                !tiene ? 'text-crema-oscura cursor-default opacity-30' : ''
-              } ${activeLetter === l ? 'bg-azul text-crema' : 'hover:bg-azul hover:text-crema'}`}
-              onClick={() => tiene && setActiveLetter(activeLetter === l ? null : l)}
-              disabled={!tiene}
-              title={tiene ? l : '—'}
-            >
-              {l}
-            </button>
-          );
-        })}
-      </nav>
+      {!showAbout && (
+        <nav className="abecedario bg-crema-oscura border-b-2 border-azul p-2.5 flex flex-wrap gap-0.5 justify-center sticky top-[88px] z-90 md:top-[80px]">
+          {abecedario.map((l) => {
+            const tiene = letrasConEntradas.has(l);
+            return (
+              <button
+                key={l}
+                className={`letra-btn font-playfair text-base font-bold w-8 h-8 flex items-center justify-center cursor-pointer border-none bg-transparent text-tinta-suave transition-all rounded-[2px] ${
+                  !tiene ? 'text-crema-oscura cursor-default opacity-30' : ''
+                } ${activeLetter === l ? 'bg-azul text-crema' : 'hover:bg-azul hover:text-crema'}`}
+                onClick={() => tiene && setActiveLetter(activeLetter === l ? null : l)}
+                disabled={!tiene}
+                title={tiene ? l : '—'}
+              >
+                {l}
+              </button>
+            );
+          })}
+        </nav>
+      )}
 
-      <main className="contenido max-w-[1100px] mx-auto p-6 pb-16">
-        {!search && !activeLetter && (
-          <section className="word-of-the-day mb-12 bg-white border-2 border-oro p-8 rounded-lg shadow-lg relative overflow-hidden group">
-            <div className="absolute top-0 right-0 bg-oro text-tinta px-4 py-1 font-bold text-xs uppercase tracking-widest">
-              Palabra del Día
-            </div>
-            <h2 className="font-playfair text-4xl font-black text-azul mb-4">
-              {wordOfTheDay.v}
+      <main className="contenido max-w-[1100px] mx-auto p-6 pb-16 min-h-[60vh]">
+        {showAbout ? (
+          <div className="about-content max-w-2xl mx-auto py-12 animate-[fadeIn_0.5s_ease]">
+            <h2 className="font-playfair text-4xl font-black text-azul mb-10 border-b-4 border-oro pb-4">
+              Sobre el diccionario
             </h2>
-            <p className="text-lg text-tinta-suave mb-4 italic leading-relaxed">
-              {wordOfTheDay.def}
-            </p>
-            {wordOfTheDay.ej && (
-              <div className="text-sm text-tinta-suave opacity-70 border-t border-dashed border-crema-oscura pt-4">
-                <span className="text-oro font-bold mr-2">✦</span>
-                "{wordOfTheDay.ej}"
-              </div>
-            )}
-            <div className="mt-6 flex justify-end">
-              <span className="text-[0.7rem] uppercase tracking-widest text-oro-claro font-bold">
-                Una joya de la identidad cordobesa
-              </span>
+            <div className="font-libre text-lg leading-relaxed text-tinta-suave space-y-6 whitespace-pre-line">
+              {aboutText}
             </div>
-          </section>
-        )}
-
-        {filteredEntries.length === 0 ? (
-          <div className="sin-resultados text-center py-16 px-8 text-tinta-suave opacity-50">
-            <p className="font-playfair text-5xl mb-4">¡Cipote!</p>
-            <p className="text-xl italic">No se ha encontrado ninguna entrada para «{search}».</p>
+            <div className="mt-16 text-center">
+              <button
+                onClick={() => setShowAbout(false)}
+                className="px-8 py-3 bg-azul text-crema font-bold text-sm tracking-[0.2em] uppercase rounded-[2px] transition-all hover:bg-azul/90 hover:-translate-y-0.5 shadow-lg shadow-azul/20 cursor-pointer"
+              >
+                Volver al diccionario
+              </button>
+            </div>
           </div>
         ) : (
-          groupedEntries.map(([letra, entradas]) => (
-            <section key={letra} className="seccion-letra mb-12" id={`sec-${letra}`}>
-              <div className="letra-header flex items-baseline gap-6 mb-6 pb-2 border-b-2 border-azul">
-                <span className="letra-grande font-playfair text-8xl font-black text-azul leading-none">
-                  {letra}
-                </span>
-                <span className="letra-count text-sm text-tinta-suave opacity-60">
-                  {entradas.length} entrada{entradas.length !== 1 ? 's' : ''}
-                </span>
+          <>
+            {!search && !activeLetter && (
+              <section className="word-of-the-day mb-12 bg-white border-2 border-oro p-8 rounded-lg shadow-lg relative overflow-hidden group">
+                <div className="absolute top-0 right-0 bg-oro text-tinta px-4 py-1 font-bold text-xs uppercase tracking-widest">
+                  Palabra del Día
+                </div>
+                <h2 className="font-playfair text-4xl font-black text-azul mb-4">
+                  {wordOfTheDay.v}
+                </h2>
+                <p className="text-lg text-tinta-suave mb-4 italic leading-relaxed">
+                  {wordOfTheDay.def}
+                </p>
+                {wordOfTheDay.ej && (
+                  <div className="text-sm text-tinta-suave opacity-70 border-t border-dashed border-crema-oscura pt-4">
+                    <span className="text-oro font-bold mr-2">✦</span>
+                    "{wordOfTheDay.ej}"
+                  </div>
+                )}
+                <div className="mt-6 flex justify-end">
+                  <span className="text-[0.7rem] uppercase tracking-widest text-oro-claro font-bold">
+                    Una joya de la identidad cordobesa
+                  </span>
+                </div>
+              </section>
+            )}
+
+            {filteredEntries.length === 0 ? (
+              <div className="sin-resultados text-center py-16 px-8 text-tinta-suave opacity-50">
+                <p className="font-playfair text-5xl mb-4">¡Cipote!</p>
+                <p className="text-xl italic">No se ha encontrado ninguna entrada para «{search}».</p>
               </div>
-              <div className="entradas-grid grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
-                {entradas.map((e, idx) => (
-                  <article
-                    key={idx}
-                    className="entrada bg-white border border-crema-oscura border-l-4 border-l-azul p-5 px-6 transition-all relative overflow-hidden group hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(26,82,118,0.12)] hover:border-l-oro"
-                  >
-                    <div className="entrada-vocablo font-playfair text-xl font-bold text-azul mb-1.5 relative flex items-baseline gap-2 flex-wrap">
-                      {highlight(e.v, search)}
-                    </div>
-                    <div className="entrada-definicion text-sm leading-relaxed text-tinta-suave">
-                      {highlight(e.def, search)}
-                    </div>
-                    {e.ej && (
-                      <div className="entrada-ejemplo mt-2 italic text-[0.82rem] text-tinta-suave opacity-70 border-t border-dashed border-crema-oscura pt-1.5">
-                        <span className="text-oro not-italic text-[0.65rem] mr-1">✦</span>
-                        {highlight(e.ej, search)}
-                      </div>
-                    )}
-                  </article>
-                ))}
-              </div>
-            </section>
-          ))
+            ) : (
+              groupedEntries.map(([letra, entradas]) => (
+                <section key={letra} className="seccion-letra mb-12" id={`sec-${letra}`}>
+                  <div className="letra-header flex items-baseline gap-6 mb-6 pb-2 border-b-2 border-azul">
+                    <span className="letra-grande font-playfair text-8xl font-black text-azul leading-none">
+                      {letra}
+                    </span>
+                    <span className="letra-count text-sm text-tinta-suave opacity-60">
+                      {entradas.length} entrada{entradas.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <div className="entradas-grid grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
+                    {entradas.map((e, idx) => (
+                      <article
+                        key={idx}
+                        className="entrada bg-white border border-crema-oscura border-l-4 border-l-azul p-5 px-6 transition-all relative overflow-hidden group hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(26,82,118,0.12)] hover:border-l-oro"
+                      >
+                        <div className="entrada-vocablo font-playfair text-xl font-bold text-azul mb-1.5 relative flex items-baseline gap-2 flex-wrap">
+                          {highlight(e.v, search)}
+                        </div>
+                        <div className="entrada-definicion text-sm leading-relaxed text-tinta-suave">
+                          {highlight(e.def, search)}
+                        </div>
+                        {e.ej && (
+                          <div className="entrada-ejemplo mt-2 italic text-[0.82rem] text-tinta-suave opacity-70 border-t border-dashed border-crema-oscura pt-1.5">
+                            <span className="text-oro not-italic text-[0.65rem] mr-1">✦</span>
+                            {highlight(e.ej, search)}
+                          </div>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ))
+            )}
+          </>
         )}
       </main>
 
@@ -328,11 +370,11 @@ export default function App() {
         <span className="opacity-60 text-[0.75rem]">
           Elaborado a partir de las palabras propuestas por internautas en redes sociales · Córdoba 2016
           <br />
-          Sincronizado: v2.2 - Mayo 2026
+          Sincronizado: v2.3 - Mayo 2026
         </span>
       </footer>
       <div className="fixed bottom-2 right-2 text-[10px] text-tinta opacity-20 pointer-events-none select-none z-[200]">
-        v2.2
+        v2.3
       </div>
     </div>
   );
