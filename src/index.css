@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --color-azul: #1a5276;
+  --color-azul-claro: #2980b9;
+  --color-crema: #fdf6e3;
+  --color-crema-oscura: #f0e6c8;
+  --color-tinta: #1a1208;
+  --color-tinta-suave: #3d2b1f;
+  --color-oro: #c8960c;
+  --color-oro-claro: #f0c040;
+  --color-rojo: #8b1a1a;
+}
+
+body {
+  background: var(--color-crema);
+  color: var(--color-tinta);
+  font-family: 'Libre Baskerville', Georgia, serif;
+  min-height: 100vh;
+}
+
+/* Patrón de fondo tipo espirales */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle at 20% 50%, rgba(26,82,118,0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(200,150,12,0.04) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* PORTADA */
+.portada-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+  background-image:
+    radial-gradient(circle at center, transparent 3px, rgba(240,230,200,0.8) 3px, rgba(240,230,200,0.8) 4px, transparent 4px),
+    radial-gradient(circle at center, transparent 6px, rgba(240,230,200,0.5) 6px, rgba(240,230,200,0.5) 7px, transparent 7px),
+    radial-gradient(circle at center, transparent 10px, rgba(240,230,200,0.3) 10px, rgba(240,230,200,0.3) 11px, transparent 11px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px, 5px 5px;
+  animation: spiralMove 20s linear infinite;
+}
+
+@keyframes spiralMove {
+  from { background-position: 0 0, 15px 15px, 5px 5px; }
+  to { background-position: 30px 30px, 45px 45px, 35px 35px; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+/* ENTRADA HOVER EFFECTS */
+.entrada::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 0;
+  background: var(--color-azul);
+  transition: height 0.2s;
+  z-index: 0;
+}

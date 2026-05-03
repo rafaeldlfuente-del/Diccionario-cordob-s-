@@ -1,0 +1,212 @@
+import {useState, useEffect, useMemo} from 'react';
+import {ENTRADAS} from './data';
+
+interface Entrada {
+  v: string;
+  def: string;
+  ej?: string;
+}
+
+export default function App() {
+  const [showApp, setShowApp] = useState(false);
+  const [search, setSearch] = useState('');
+  const [activeLetter, setActiveLetter] = useState<string | null>(null);
+
+  const letraDeEntrada = (e: Entrada) => {
+    return e.v.normalize('NFD').replace(/[\u0300-\u036f]/g, '')[0].toUpperCase();
+  };
+
+  const filteredEntries = useMemo(() => {
+    let result = ENTRADAS;
+
+    if (activeLetter) {
+      result = result.filter(e => letraDeEntrada(e) === activeLetter);
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(e =>
+        e.v.toLowerCase().includes(q) ||
+        e.def.toLowerCase().includes(q) ||
+        (e.ej && e.ej.toLowerCase().includes(q))
+      );
+    }
+
+    return result;
+  }, [search, activeLetter]);
+
+  const groupedEntries = useMemo(() => {
+    const groups: {[key: string]: Entrada[]} = {};
+    filteredEntries.forEach(e => {
+      const l = letraDeEntrada(e);
+      if (!groups[l]) groups[l] = [];
+      groups[l].push(e);
+    });
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b, 'es'));
+  }, [filteredEntries]);
+
+  const letrasConEntradas = useMemo(() => {
+    return new Set(ENTRADAS.map(letraDeEntrada));
+  }, []);
+
+  const abecedario = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+
+  const highlight = (text: string, q: string) => {
+    if (!q.trim()) return text;
+    const parts = text.split(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+    return (
+      <>
+        {parts.map((part, i) =>
+          part.toLowerCase() === q.toLowerCase() ? (
+            <mark key={i} className="bg-oro-claro text-tinta px-0.5 rounded-sm">
+              {part}
+            </mark>
+          ) : (
+            part
+          )
+        )}
+      </>
+    );
+  };
+
+  if (!showApp) {
+    return (
+      <div
+        className="portada min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-tinta cursor-pointer"
+        onClick={() => setShowApp(true)}
+      >
+        <div className="portada-pattern"></div>
+        <div className="portada-content relative z-10 text-center p-12">
+          <div className="portada-label font-playfair text-[clamp(1rem,3vw,1.4rem)] tracking-[0.5em] color-crema-oscura uppercase mb-4 opacity-0 animate-[fadeUp_1s_ease_0.3s_forwards] text-crema-oscura">
+            Fundación Córdoba Ciudad Cultural
+          </div>
+          <div className="portada-titulo font-playfair text-[clamp(5rem,18vw,14rem)] font-black text-crema leading-[0.85] tracking-tight opacity-0 animate-[fadeUp_1s_ease_0.6s_forwards]">
+            DIC
+            <span className="block text-azul-claro">CIO</span>
+            NARIO
+          </div>
+          <div
+            className="portada-titulo font-playfair text-[clamp(3rem,11vw,8rem)] font-black leading-[0.85] tracking-tight text-azul-claro mt-2 opacity-0 animate-[fadeUp_1s_ease_0.7s_forwards]"
+          >
+            CORDOBÉS
+          </div>
+          <div className="portada-subtexto mt-8 text-[clamp(0.8rem,2vw,1rem)] text-crema-oscura opacity-0 tracking-[0.2em] uppercase animate-[fadeUp_1s_ease_0.9s_forwards]">
+            Habla coloquial · Idiosincrasia · Orgullo de pertenencia
+          </div>
+          <button
+            className="portada-cta mt-12 inline-block px-10 py-4 border border-oro text-oro-claro font-libre text-sm tracking-[0.15em] uppercase cursor-pointer transition-all hover:bg-oro hover:text-tinta bg-transparent opacity-0 animate-[fadeUp_1s_ease_1.2s_forwards]"
+            onClick={() => setShowApp(true)}
+          >
+            Entrar al diccionario
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app block animate-[fadeIn_0.8s_ease] relative z-10">
+      <header className="bg-azul text-crema p-6 sticky top-0 z-100 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+        <div className="max-w-[1100px] mx-auto flex items-center gap-8 flex-wrap">
+          <div
+            className="header-titulo font-playfair text-2xl font-bold tracking-wider cursor-pointer"
+            onClick={() => setShowApp(false)}
+          >
+            <small className="block font-libre text-[0.65rem] tracking-[0.2em] uppercase text-oro-claro font-normal italic">
+              Diccionario
+            </small>
+            Cordobés
+          </div>
+          <div className="buscador-wrap flex-1 relative min-w-[200px]">
+            <input
+              type="text"
+              id="busqueda"
+              className="w-full py-2.5 pl-11 pr-4 border border-white/20 bg-white/10 text-crema font-libre text-base rounded-[2px] outline-none focus:bg-white/20 focus:border-oro transition-all placeholder:text-crema-oscura/50"
+              placeholder="Buscar palabra o definición…"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setActiveLetter(null);
+              }}
+              autoComplete="off"
+            />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none">🔍</span>
+          </div>
+          <div className="contador font-libre text-sm text-oro-claro whitespace-nowrap">
+            {filteredEntries.length} entradas
+          </div>
+        </div>
+      </header>
+
+      <nav className="abecedario bg-crema-oscura border-b-2 border-azul p-2.5 flex flex-wrap gap-0.5 justify-center sticky top-[88px] z-90 md:top-[80px]">
+        {abecedario.map((l) => {
+          const tiene = letrasConEntradas.has(l);
+          return (
+            <button
+              key={l}
+              className={`letra-btn font-playfair text-base font-bold w-8 h-8 flex items-center justify-center cursor-pointer border-none bg-transparent text-tinta-suave transition-all rounded-[2px] ${
+                !tiene ? 'text-crema-oscura cursor-default opacity-30' : ''
+              } ${activeLetter === l ? 'bg-azul text-crema' : 'hover:bg-azul hover:text-crema'}`}
+              onClick={() => tiene && setActiveLetter(activeLetter === l ? null : l)}
+              disabled={!tiene}
+              title={tiene ? l : '—'}
+            >
+              {l}
+            </button>
+          );
+        })}
+      </nav>
+
+      <main className="contenido max-w-[1100px] mx-auto p-6 pb-16">
+        {filteredEntries.length === 0 ? (
+          <div className="sin-resultados text-center py-16 px-8 text-tinta-suave opacity-50">
+            <p className="font-playfair text-5xl mb-4">¡Cipote!</p>
+            <p className="text-xl italic">No se ha encontrado ninguna entrada para «{search}».</p>
+          </div>
+        ) : (
+          groupedEntries.map(([letra, entradas]) => (
+            <section key={letra} className="seccion-letra mb-12" id={`sec-${letra}`}>
+              <div className="letra-header flex items-baseline gap-6 mb-6 pb-2 border-b-2 border-azul">
+                <span className="letra-grande font-playfair text-8xl font-black text-azul leading-none">
+                  {letra}
+                </span>
+                <span className="letra-count text-sm text-tinta-suave opacity-60">
+                  {entradas.length} entrada{entradas.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="entradas-grid grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
+                {entradas.map((e, idx) => (
+                  <article
+                    key={idx}
+                    className="entrada bg-white border border-crema-oscura border-l-4 border-l-azul p-5 px-6 transition-all relative overflow-hidden group hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(26,82,118,0.12)] hover:border-l-oro"
+                  >
+                    <div className="entrada-vocablo font-playfair text-xl font-bold text-azul mb-1.5 relative flex items-baseline gap-2 flex-wrap">
+                      {highlight(e.v, search)}
+                    </div>
+                    <div className="entrada-definicion text-sm leading-relaxed text-tinta-suave">
+                      {highlight(e.def, search)}
+                    </div>
+                    {e.ej && (
+                      <div className="entrada-ejemplo mt-2 italic text-[0.82rem] text-tinta-suave opacity-70 border-t border-dashed border-crema-oscura pt-1.5">
+                        <span className="text-oro not-italic text-[0.65rem] mr-1">✦</span>
+                        {highlight(e.ej, search)}
+                      </div>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))
+        )}
+      </main>
+
+      <footer className="bg-tinta text-crema-oscura text-center p-8 text-sm tracking-wide opacity-90">
+        <strong className="text-oro-claro font-bold">Diccionario Cordobés</strong> · Fundación Córdoba Ciudad Cultural
+        <br />
+        <span className="opacity-60 text-[0.75rem]">
+          Elaborado a partir de las palabras propuestas por internautas en redes sociales · Córdoba 2016
+        </span>
+      </footer>
+    </div>
+  );
+}
