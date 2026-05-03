@@ -1,5 +1,6 @@
 import {useState, useEffect, useMemo} from 'react';
 import {ENTRADAS} from './data';
+import { Share2, X } from 'lucide-react';
 
 interface Entrada {
   v: string;
@@ -35,6 +36,25 @@ export default function App() {
     console.log(`User response to install prompt: ${outcome}`);
     setDeferredPrompt(null);
     setShowInstallBtn(false);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Diccionario Cordobés',
+      text: '¡Mira este diccionario del habla cordobesa!',
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Enlace copiado al portapapeles');
+      }
+    } catch (err) {
+      console.error('Error al compartir:', err);
+    }
   };
 
   const letraDeEntrada = (e: Entrada) => {
@@ -168,7 +188,7 @@ export default function App() {
             onClick={() => setShowApp(false)}
           >
             <small className="block font-libre text-[0.65rem] tracking-[0.2em] uppercase text-oro-claro font-normal italic">
-              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v2.0</span>
+              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v2.1</span>
             </small>
             Cordobés
           </div>
@@ -176,7 +196,7 @@ export default function App() {
             <input
               type="text"
               id="busqueda"
-              className="w-full py-2.5 pl-11 pr-4 border border-white/20 bg-white/10 text-crema font-libre text-base rounded-[2px] outline-none focus:bg-white/20 focus:border-oro transition-all placeholder:text-crema-oscura/50"
+              className="w-full py-2.5 pl-11 pr-10 border border-white/20 bg-white/10 text-crema font-libre text-base rounded-[2px] outline-none focus:bg-white/20 focus:border-oro transition-all placeholder:text-crema-oscura/50"
               placeholder="Buscar palabra o definición…"
               value={search}
               onChange={(e) => {
@@ -185,7 +205,16 @@ export default function App() {
               }}
               autoComplete="off"
             />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none">🔍</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none opacity-50">🔍</span>
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-crema/60 hover:text-crema transition-colors cursor-pointer"
+                title="Limpiar búsqueda"
+              >
+                <X size={18} />
+              </button>
+            )}
           </div>
           <div className="contador font-libre text-sm text-oro-claro whitespace-nowrap flex items-center gap-4">
             {showInstallBtn && (
@@ -196,6 +225,13 @@ export default function App() {
                 Instalar App
               </button>
             )}
+            <button
+              onClick={handleShare}
+              className="text-crema/80 hover:text-oro-claro transition-colors cursor-pointer"
+              title="Compartir Diccionario"
+            >
+              <Share2 size={20} />
+            </button>
             <span>{filteredEntries.length} entradas</span>
           </div>
         </div>
@@ -294,11 +330,11 @@ export default function App() {
         <span className="opacity-60 text-[0.75rem]">
           Elaborado a partir de las palabras propuestas por internautas en redes sociales · Córdoba 2016
           <br />
-          Sincronizado: v2.0 - Mayo 2026
+          Sincronizado: v2.1 - Mayo 2026
         </span>
       </footer>
       <div className="fixed bottom-2 right-2 text-[10px] text-tinta opacity-20 pointer-events-none select-none z-[200]">
-        v2.0
+        v2.1
       </div>
     </div>
   );
