@@ -291,9 +291,12 @@ export default function App() {
         <span className="opacity-60 text-[0.75rem]">
           Elaborado a partir de las palabras propuestas por internautas en redes sociales · Córdoba 2016
           <br />
-          Sincronizado: v1.5 - Mayo 2026
+          Sincronizado: v1.6 - Mayo 2026
         </span>
       </footer>
+      <div className="fixed bottom-2 right-2 text-[10px] text-tinta opacity-20 pointer-events-none select-none z-[200]">
+        v1.6
+      </div>
     </div>
   );
 }
