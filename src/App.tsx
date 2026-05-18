@@ -1,6 +1,6 @@
 import {useState, useEffect, useMemo} from 'react';
 import {ENTRADAS} from './data';
-import { Share2, X } from 'lucide-react';
+import { Share2, X, Dices } from 'lucide-react';
 
 interface Entrada {
   v: string;
@@ -77,7 +77,12 @@ Nuestro agradecimiento a todas las personas que han participado en la elaboraci√
     return ENTRADAS[index];
   };
 
-  const wordOfTheDay = useMemo(() => getWordOfTheDay(), []);
+  const [wordOfTheDay, setWordOfTheDay] = useState<Entrada>(getWordOfTheDay());
+
+  const handleRandomWord = () => {
+    const randomIndex = Math.floor(Math.random() * ENTRADAS.length);
+    setWordOfTheDay(ENTRADAS[randomIndex]);
+  };
 
   useEffect(() => {
     if ('Notification' in window && Notification.permission !== 'denied') {
@@ -196,7 +201,7 @@ Nuestro agradecimiento a todas las personas que han participado en la elaboraci√
             }}
           >
             <small className="block font-libre text-[0.65rem] tracking-[0.2em] uppercase text-oro-claro font-normal italic">
-              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v2.3</span>
+              Diccionario <span className="text-[10px] opacity-40 ml-1 not-italic lowercase tracking-normal">v2.4</span>
             </small>
             Cordob√©s
           </div>
@@ -297,8 +302,15 @@ Nuestro agradecimiento a todas las personas que han participado en la elaboraci√
           <>
             {!search && !activeLetter && (
               <section className="word-of-the-day mb-12 bg-white border-2 border-oro p-8 rounded-lg shadow-lg relative overflow-hidden group">
-                <div className="absolute top-0 right-0 bg-oro text-tinta px-4 py-1 font-bold text-xs uppercase tracking-widest">
+                <div className="absolute top-0 right-0 bg-oro text-tinta px-4 py-1 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
                   Palabra del D√≠a
+                  <button 
+                    onClick={handleRandomWord}
+                    className="ml-2 hover:rotate-180 transition-transform duration-500 cursor-pointer p-1 -mr-1"
+                    title="Ver otra palabra al azar"
+                  >
+                    <Dices size={14} />
+                  </button>
                 </div>
                 <h2 className="font-playfair text-4xl font-black text-azul mb-4">
                   {wordOfTheDay.v}
@@ -370,11 +382,11 @@ Nuestro agradecimiento a todas las personas que han participado en la elaboraci√
         <span className="opacity-60 text-[0.75rem]">
           Elaborado a partir de las palabras propuestas por internautas en redes sociales ¬∑ C√≥rdoba 2016
           <br />
-          Sincronizado: v2.3 - Mayo 2026
+          Sincronizado: v2.4 - Mayo 2026
         </span>
       </footer>
       <div className="fixed bottom-2 right-2 text-[10px] text-tinta opacity-20 pointer-events-none select-none z-[200]">
-        v2.3
+        v2.4
       </div>
     </div>
   );
